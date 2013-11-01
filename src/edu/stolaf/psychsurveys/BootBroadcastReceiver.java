@@ -8,7 +8,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    Intent service = new Intent(context, ToastService.class);
+    Intent service = new Intent(context, MainService.class);
     context.startService(service);
   }
 }
