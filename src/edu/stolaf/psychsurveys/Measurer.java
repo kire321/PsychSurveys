@@ -11,10 +11,26 @@ import java.util.Vector;
 import android.content.Context;
 import android.util.Log;
 
+class Stop extends TimerTask {
+	
+	Vector<Measurement> measurements;
+	
+	public Stop(Vector<Measurement> vm) {
+		measurements = vm;
+	}
+	
+	public void run() {
+		StringBuffer toWrite = new StringBuffer();								
+		for (Measurement measurement : measurements) {
+			toWrite.append(measurement.stop() + "\n");
+		}
+		Measurer.appendToCache(new String(toWrite));
+	}			
+};
+
 class Measurer {
 	public final Vector<Measurement> measurements;
 	public final TimerTask start;
-	public final TimerTask stop;
 	public static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
 	
 	public Measurer() {
@@ -25,17 +41,8 @@ class Measurer {
 				for (Measurement measurement : measurements) {
 					measurement.start();
 				}
-				MainService.timer.schedule(stop, MainService.measureLength);
+				MainService.timer.schedule(new Stop(measurements), MainService.measureLength);
 			}
-		};
-		stop = new TimerTask() {
-			public void run() {
-				StringBuffer toWrite = new StringBuffer();								
-				for (Measurement measurement : measurements) {
-					toWrite.append(measurement.stop() + "\n");
-				}
-				appendToCache(new String(toWrite));
-			}			
 		};
 	}
 	

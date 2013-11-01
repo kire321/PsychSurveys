@@ -8,7 +8,7 @@ import android.os.*;
 import java.util.*;
 
 public class MainService extends Service {
-	static final int revisionNumber = 2;
+	static final int revisionNumber = 1;
 	static final String cache = "PsychSurveys.cache";
 	static final int measureLength = 10 * 1000;
 	static final int measureFreq = 30 * 1000;
