@@ -2,6 +2,8 @@ package edu.stolaf.psychsurveys;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -14,12 +16,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-//test case: new, unbonded devices
 //todo: don't connect to devices that are already peers
 public class Bluetooth extends BroadcastReceiver implements Measurement {
 
 	public static BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
 	public static UUID uuid = new UUID(398754, 298436880);
+	public static Set<String> nonPeers = new HashSet<String>();
 	Server server = new Server();
 	int phones;
 	
@@ -100,11 +102,13 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 	}
 	
 	void makeConnection(BluetoothDevice device) {
-		if (device.getAddress().compareTo(ba.getAddress()) > 0) {
-			Log.i("PsychSurveys", "Waiting for connection from " + device.getAddress());
-		} else {
-			Log.i("PsychSurveys", "Connecting to " + device.getAddress());
-			(new Client(device)).start();
+		if (!nonPeers.contains(device.getAddress())) {
+			if (device.getAddress().compareTo(ba.getAddress()) > 0) {
+				Log.i("PsychSurveys", "Waiting for connection from " + device.getAddress());
+			} else {
+				Log.i("PsychSurveys", "Connecting to " + device.getAddress());
+				(new Client(device)).start();
+			}
 		}
 	}
 }
@@ -143,6 +147,7 @@ class Client extends Thread {
 			socket.close();
 		} catch (IOException e) {
 			Log.e("PsychSurveys", "", e);
+			Bluetooth.nonPeers.add(device.getAddress());
 		} 		
 	}
 }
