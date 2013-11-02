@@ -22,7 +22,9 @@ class Stop extends TimerTask {
 	public void run() {
 		StringBuffer toWrite = new StringBuffer();								
 		for (Measurement measurement : measurements) {
-			toWrite.append(measurement.stop() + "\n");
+			String result = measurement.stop();
+			if (result != null)
+				toWrite.append(result + "\n");
 		}
 		Measurer.appendToCache(new String(toWrite));
 	}			

@@ -31,7 +31,7 @@ public class Sound implements Measurement {
 	@Override
 	public String stop() {
 		if(recorder == null) {
-			return "Error recording sound.\n";
+			return "Error recording sound.";
 		} else {
 			String sound = "SOUND: " + Integer.toString(recorder.getMaxAmplitude());
 			recorder.stop();

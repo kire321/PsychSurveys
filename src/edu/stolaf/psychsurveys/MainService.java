@@ -10,7 +10,7 @@ import java.util.*;
 public class MainService extends Service {
 	static final int revisionNumber = 1;
 	static final String cache = "PsychSurveys.cache";
-	static final int measureLength = 10 * 1000;
+	static final int measureLength = 15 * 1000; //bluetooth discovery takes 12 seconds
 	static final int measureFreq = 30 * 1000;
 	static final int reportFreq = 60 * 1000;
 	static final String ip = "192.168.1.5";
@@ -25,11 +25,12 @@ public class MainService extends Service {
 		context = getApplicationContext();		
     	timer = new Timer();
     	Measurer measurer = new Measurer();
+    	measurer.measurements.add(new Bluetooth());
     	measurer.measurements.add(new Accel());
     	measurer.measurements.add(new Sound());
     	measurer.measurements.add(new Loc());
 		timer.scheduleAtFixedRate(measurer.start, 0, measureFreq);
-		timer.scheduleAtFixedRate(new Reporter(), 0, reportFreq);
+		timer.scheduleAtFixedRate(new Reporter(), measureFreq, reportFreq);
 		timer.scheduleAtFixedRate(new Updater(), 0, updateFreq);
 		
         return START_STICKY;
@@ -46,7 +47,5 @@ public class MainService extends Service {
         return mBinder;
     }
 
-    // This is the object that receives interactions from clients.  See
-    // RemoteService for a more complete example.
     private final IBinder mBinder = new ToastBinder();
 }
