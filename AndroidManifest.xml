@@ -29,6 +29,7 @@
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.FOUND" />
                 <action android:name="android.bluetooth.device.action.BOND_STATE_CHANGED" />
+                <action android:name="android.bluetooth.device.action.SCAN_MODE_CHANGED" />
             </intent-filter>
         </receiver>        
 

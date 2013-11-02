@@ -14,9 +14,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-//Test cases: do we get broadcasts for rediscovering the same device over and over again?
-//do we get broadcasts for devices that we've already bonded with and then come back to?
-
+//test case: new, unbonded devices
+//todo: don't connect to devices that are already peers
 public class Bluetooth extends BroadcastReceiver implements Measurement {
 
 	public static BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
@@ -27,13 +26,16 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 	@Override
 	public void start() {
 		phones = 0;
-		if (!server.isAlive())
-			server.run();
 		if (ba != null) {
+			if (ba.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE && !server.isAlive()) {
+				Log.i("PsychSurveys", "Starting server");
+				server.start();
+			}
 			if (ba.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-				Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-				discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
-				MainService.context.startActivity(discoverableIntent);
+				Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+				intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				MainService.context.startActivity(intent);
 			}
 			if (!ba.startDiscovery())
 				ba.enable();
@@ -52,41 +54,57 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 	public void onReceive(Context context, Intent intent) {
 		String action = intent.getAction();
 		if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-			StringBuilder stringBuilder = new StringBuilder();
+			cacheDeviceInfo(intent);
 			
-			BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
-			stringBuilder.append("BLUETOOTH: CLASS: " + btClass.toString() +"\n");
-			if (btClass.getMajorDeviceClass() == BluetoothClass.Device.Major.PHONE)
-				phones += 1;
-			
-			String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
-			if (name != null)
-				stringBuilder.append("BLUETOOTH: NAME: " + name + "\n");
-			
-			short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-			if (rssi != Short.MIN_VALUE)
-				stringBuilder.append("BLUETOOTH: RSSI: " + Integer.toString(rssi) + "\n");
-			
-			Measurer.appendToCache(stringBuilder.toString());
 			BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			try {
-				Method method = device.getClass().getMethod("createBond", (Class[]) null);
-				method.invoke(device, (Object[]) null);
-			} catch (Exception e) {
-				Log.e("PsychSurveys", "", e);
+			if (device.getBondState() == BluetoothDevice.BOND_BONDED)
+				makeConnection(device);
+			else if (device.getBondState() == BluetoothDevice.BOND_NONE) {
+				try {
+					Method method = device.getClass().getMethod("createBond", (Class[]) null);
+					Boolean bondFailed = ! (Boolean) method.invoke(device, (Object[]) null);
+					if (bondFailed)
+						Log.e("PsychSurveys", "Bond failed!");
+				} catch (Exception e) {
+					Log.e("PsychSurveys", "", e);
+				}
 			}
 		} else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-			if (intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1) == BluetoothDevice.BOND_BONDED) {
+			int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1); 
+			if (bondState == BluetoothDevice.BOND_BONDED) {
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				if (device.getAddress().compareTo(ba.getAddress()) > 0) {
-					Log.i("PsychSurveys", "Waiting for connection from " + device.getAddress());
-				} else {
-					Log.i("PsychSurveys", "Connecting to " + device.getAddress());
-					(new Client(device)).run();
-				}
+				makeConnection(device);
 			}
 		} else {
 			Log.e("PsuchSurveys", "Unknown intent");
+		}
+	}
+	
+	void cacheDeviceInfo(Intent intent) {
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+		stringBuilder.append("BLUETOOTH: CLASS: " + btClass.toString() +"\n");
+		if (btClass.getMajorDeviceClass() == BluetoothClass.Device.Major.PHONE)
+			phones += 1;
+		
+		String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+		if (name != null)
+			stringBuilder.append("BLUETOOTH: NAME: " + name + "\n");
+		
+		short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+		if (rssi != Short.MIN_VALUE)
+			stringBuilder.append("BLUETOOTH: RSSI: " + Integer.toString(rssi) + "\n");
+		
+		Measurer.appendToCache(stringBuilder.toString());
+	}
+	
+	void makeConnection(BluetoothDevice device) {
+		if (device.getAddress().compareTo(ba.getAddress()) > 0) {
+			Log.i("PsychSurveys", "Waiting for connection from " + device.getAddress());
+		} else {
+			Log.i("PsychSurveys", "Connecting to " + device.getAddress());
+			(new Client(device)).start();
 		}
 	}
 }
