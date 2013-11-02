@@ -67,17 +67,17 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	
 	@Override
 	public void onConnected(Bundle arg0) {
-		Log.i("LOC", "Service connected");
+		Log.i("PsychSurveys", "Service connected");
 	}
 
 	@Override
 	public void onDisconnected() {
-		Log.i("LOC", "Service disconnected");
+		Log.i("PsychSurveys", "Service disconnected");
 	}
 	
 	@Override
 	public void onConnectionFailed(ConnectionResult arg0) {
-		Log.i("LOC", "Connection to service failed");
+		Log.i("PsychSurveys", "Connection to service failed");
 	}
 
 }

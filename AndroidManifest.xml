@@ -24,6 +24,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+        </receiver>
+        <receiver android:name="edu.stolaf.psychsurveys.Bluetooth" >
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.FOUND" />
+                <action android:name="android.bluetooth.device.action.BOND_STATE_CHANGED" />
+            </intent-filter>
         </receiver>        
 
         <service android:enabled="true" android:name="edu.stolaf.psychsurveys.MainService" />        
