@@ -1,5 +1,7 @@
 package edu.stolaf.psychsurveys;
 
+import android.util.Log;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -9,7 +11,6 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import android.content.Context;
-import android.util.Log;
 
 class Stop extends TimerTask {
 	

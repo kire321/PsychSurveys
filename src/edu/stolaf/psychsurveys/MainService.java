@@ -11,7 +11,7 @@ import java.util.*;
 import java.lang.Process;
 
 public class MainService extends Service {
-	static final int revisionNumber = 1;
+	static final int revisionNumber = 2; //These files differ from rn2 in production
 	static final String cache = "PsychSurveys.cache";
 	static final int measureLength = 15 * 1000; //bluetooth discovery takes 12 seconds
 	static final int measureFreq = 30 * 1000;
