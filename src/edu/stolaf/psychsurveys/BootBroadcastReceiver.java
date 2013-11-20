@@ -8,7 +8,6 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    Intent service = new Intent(context, MainService.class);
-    context.startService(service);
+	  (new Globals(context)).schedulePsychSurveysComponents();
   }
 }

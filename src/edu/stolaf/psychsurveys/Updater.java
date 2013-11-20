@@ -1,34 +1,18 @@
 package edu.stolaf.psychsurveys;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.TimerTask;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import org.apache.commons.io.IOUtils;
-
-class Updater extends TimerTask {
+class Updater extends MinimalService {
 	
 	private String fileName = "PsychSurveys.apk";
-	private String path = MainService.context.getFilesDir().getAbsolutePath() + "/" + fileName;
-	
-	private String execForOutput(String cmd) throws IOException, InterruptedException {
-		Process process = Runtime.getRuntime().exec(cmd);
-		int status = process.waitFor();
-		if(status != 0) {
-			Log.e("PsychSurveys", "Nonzero exit status when running " + cmd);
-			throw new IOException("Nonzero exit status");
-		}
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(process.getInputStream(), writer);
-		return writer.toString();
-	}
+	private String path = Globals.context.getFilesDir().getAbsolutePath() + "/" + fileName;
 	
 	private Boolean checkForUpdates() throws IOException, InterruptedException {
-		String reply = execForOutput("curl -f " + MainService.cgi + "?revNo=" + Integer.toString(MainService.revisionNumber));
+		String reply = Globals.execForOutput("curl -f " + Globals.cgi + "?revNo=" + Integer.toString(Globals.revisionNumber));
 		if(reply.equals("No update.\n\n")) {
 			Log.i("PsychSurveys", "No update.");
 			return false;
@@ -42,8 +26,8 @@ class Updater extends TimerTask {
 	}
 	
 	private void downloadUpdates() throws IOException, InterruptedException {		
-		MainService.exec("curl -f " + MainService.url + fileName + " -o " + path); 
-		MainService.exec("chmod 666 " + path);
+		Globals.exec("curl -f " + Globals.url + fileName + " -o " + path); 
+		Globals.exec("chmod 666 " + path);
 	}
 	
 	private void installUpdates() {
@@ -51,11 +35,10 @@ class Updater extends TimerTask {
 		intent.setAction(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.parse("file://" + path), "application/vnd.android.package-archive");
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		MainService.context.startActivity(intent);
+		Globals.context.startActivity(intent);
 	}
 	
-	@Override
-	public void run() {
+	public void run() {		
 		try {
 			if (checkForUpdates()) {
 				downloadUpdates();	

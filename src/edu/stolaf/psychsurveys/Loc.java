@@ -17,12 +17,12 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	LocationRequest locationRequest;
 	
 	public Loc() {
-		locationClient = new LocationClient(MainService.context, this, this);
+		locationClient = new LocationClient(Globals.context, this, this);
 		locationClient.connect();
 		locationRequest = LocationRequest.create();
-		locationRequest.setExpirationDuration(MainService.measureLength);
-		locationRequest.setFastestInterval(MainService.reportFreq);
-		locationRequest.setInterval(MainService.measureFreq);
+		locationRequest.setExpirationDuration(Globals.measureLength);
+		locationRequest.setFastestInterval(Globals.reportFreq);
+		locationRequest.setInterval(Globals.measureFreq);
 		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 	}
 
@@ -30,7 +30,7 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	@Override
 	public void start() {
 		if(locationClient.isConnected()) {
-			Handler handler = new Handler(MainService.context.getMainLooper());
+			Handler handler = new Handler(Globals.context.getMainLooper());
 			final Loc self = this;
 			Runnable runnable = new Runnable() {
 				@Override
@@ -51,7 +51,7 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 				return "LOC: no location available.";
 			} else {
 				Log.i("PsychSurveys", "Location available.");				
-				String loctime = "LOCTIME: " + Measurer.format.format(location.getTime()) + "\n";
+				String loctime = "LOCTIME: " + Globals.format.format(location.getTime()) + "\n";
 				String lat = "LAT: " + Double.toString(location.getLatitude()) + "\n";
 				String lon = "LON: " + Double.toString(location.getLongitude());	
 				return loctime + lat + lon;

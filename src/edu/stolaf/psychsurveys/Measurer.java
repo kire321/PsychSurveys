@@ -1,65 +1,47 @@
 package edu.stolaf.psychsurveys;
 
 import android.util.Log;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.TimerTask;
-import java.util.Vector;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+
+import java.util.*;
 
 class Stop extends TimerTask {
 	
-	Vector<Measurement> measurements;
-	
-	public Stop(Vector<Measurement> vm) {
-		measurements = vm;
-	}
-	
 	public void run() {
 		StringBuffer toWrite = new StringBuffer();								
-		for (Measurement measurement : measurements) {
+		for (Measurement measurement : Measurer.measurements) {
 			String result = measurement.stop();
 			if (result != null)
 				toWrite.append(result + "\n");
 		}
-		Measurer.appendToCache(new String(toWrite));
+		Globals.appendToCache(new String(toWrite));
+		Measurer.wakeLock.release();
 	}			
 };
 
-class Measurer {
-	public final Vector<Measurement> measurements;
-	public final TimerTask start;
-	public static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+public class Measurer extends MinimalService {
+
+	public static Vector<Measurement> measurements = new Vector<Measurement>();
+	public static WakeLock wakeLock;
 	
-	public Measurer() {
-		measurements = new Vector<Measurement>();
-		start = new TimerTask() {
-			public void run() {
-				Log.i("PsychSurveys", "Revision Number: " + Integer.toString(MainService.revisionNumber));
-				for (Measurement measurement : measurements) {
-					measurement.start();
-				}
-				MainService.timer.schedule(new Stop(measurements), MainService.measureLength);
-			}
-		};
-	}
-	
-	static public void appendToCache(String str) {
-		try {
-			OutputStreamWriter out = new OutputStreamWriter(MainService.context.openFileOutput(MainService.cache, Context.MODE_APPEND));
-			String time = "TIME: " + format.format(System.currentTimeMillis()) + "\n";
-			String rev = "REV: " + Integer.toString(MainService.revisionNumber) + "\n";				
-			out.write(time + rev + str + "\n");
-			out.close();
-		} catch (FileNotFoundException e) {
-			Log.e("PsychSurveys", "", e);
-		} catch (IOException e) {
-			Log.e("PsychSurveys", "", e);
-		}
-	}
+	@SuppressLint("Wakelock")
+	public void run() {		
+		PowerManager powerManager = (PowerManager) Globals.context.getSystemService(Context.POWER_SERVICE); 
+    	wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MainService");
+        wakeLock.acquire();
+		
+		measurements.add(new Bluetooth());
+    	measurements.add(new Accel());
+    	measurements.add(new Sound());
+    	measurements.add(new Loc());
+    	
+        Log.i("PsychSurveys", "Revision Number: " + Integer.toString(Globals.revisionNumber));
+        for (Measurement measurement : measurements) {
+                measurement.start();
+        }
+        (new Timer()).schedule(new Stop(), Globals.measureLength);
+    }
 }

@@ -37,7 +37,7 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 				Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 				intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				MainService.context.startActivity(intent);
+				Globals.context.startActivity(intent);
 			}
 			if (!ba.startDiscovery())
 				ba.enable();
@@ -98,7 +98,7 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 		if (rssi != Short.MIN_VALUE)
 			stringBuilder.append("BLUETOOTH: RSSI: " + Integer.toString(rssi) + "\n");
 		
-		Measurer.appendToCache(stringBuilder.toString());
+		Globals.appendToCache(stringBuilder.toString());
 	}
 	
 	void makeConnection(BluetoothDevice device) {
