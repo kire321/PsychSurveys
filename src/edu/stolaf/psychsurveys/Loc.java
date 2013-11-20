@@ -17,7 +17,7 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	LocationRequest locationRequest;
 	
 	public Loc() {
-		locationClient = new LocationClient(Globals.context, this, this);
+		locationClient = new LocationClient(Measurer.context, this, this);
 		locationClient.connect();
 		locationRequest = LocationRequest.create();
 		locationRequest.setExpirationDuration(Globals.measureLength);
@@ -30,7 +30,7 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	@Override
 	public void start() {
 		if(locationClient.isConnected()) {
-			Handler handler = new Handler(Globals.context.getMainLooper());
+			Handler handler = new Handler(Measurer.context.getMainLooper());
 			final Loc self = this;
 			Runnable runnable = new Runnable() {
 				@Override

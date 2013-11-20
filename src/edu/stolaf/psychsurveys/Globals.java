@@ -1,8 +1,6 @@
 package edu.stolaf.psychsurveys;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -17,14 +15,14 @@ import android.util.Log;
 
 public class Globals {
 	
-	static Context context;
+	private Context context;
 	
 	public Globals(Context con) {
 		context = con;
 	}
 	
 	static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
-	static final int revisionNumber = 3;
+	static final int revisionNumber = 2;
 	static final String cache = "PsychSurveys.cache";
 	static final String url = "www.cs.stolaf.edu/projects/sensors/";
 	static final String cgi = url + "backend.cgi";
@@ -32,39 +30,26 @@ public class Globals {
 	static final int port = 8000;
 	static final int measureLength = 15*1000;
 	
-	//static final int measureFreq = 10 * 60 * 1000; //for production
-	static final int measureFreq = 30 * 1000; //for testing
-	//static final int reportFreq = 24 * 60 * 60 * 1000; //for production
-	static final int reportFreq = 60 * 1000; //for testing
-	//static final int updateFreq = 24 * 60 * 60 * 1000; //for production
-	static final int updateFreq = 60 * 1000; //for testing
+	static final int measureFreq = 10 * 60 * 1000; //for production
+	//static final int measureFreq = 30 * 1000; //for testing
+	static final int reportFreq = 24 * 60 * 60 * 1000; //for production
+	//static final int reportFreq = 60 * 1000; //for testing
+	static final int updateFreq = 24 * 60 * 60 * 1000; //for production
+	//static final int updateFreq = 60 * 1000; //for testing
 	
 	void schedule(Class<?> cls, int delay, int period) {
 		Intent intent = new Intent();
         intent.setClass(context, cls);
-        PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, 0);
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, period, pendingIntent);
 	}
 	
 	void schedulePsychSurveysComponents() {				
+		Log.i("PsychSurveys", "Starting Components");
 		schedule(Measurer.class, 0, measureFreq);
 		schedule(Reporter.class, measureFreq, reportFreq);
 		schedule(Updater.class, 0, updateFreq);
-	}
-
-	static public void appendToCache(String str) {
-		try {
-			OutputStreamWriter out = new OutputStreamWriter(context.openFileOutput(cache, Context.MODE_APPEND));
-			String time = "TIME: " + format.format(System.currentTimeMillis()) + "\n";
-			String rev = "REV: " + Integer.toString(revisionNumber) + "\n";				
-			out.write(time + rev + str + "\n");
-			out.close();
-		} catch (FileNotFoundException e) {
-			Log.e("PsychSurveys", "", e);
-		} catch (IOException e) {
-			Log.e("PsychSurveys", "", e);
-		}
 	}
 	
 	static public Boolean exec(String cmd) {

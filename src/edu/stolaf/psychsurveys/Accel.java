@@ -13,7 +13,7 @@ class Accel implements SensorEventListener, Measurement {
 	Sensor accelerometer;
 	
     public Accel() {
-    	sensorManager = (SensorManager) Globals.context.getSystemService(Context.SENSOR_SERVICE);
+    	sensorManager = (SensorManager) Measurer.context.getSystemService(Context.SENSOR_SERVICE);
     	accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 	

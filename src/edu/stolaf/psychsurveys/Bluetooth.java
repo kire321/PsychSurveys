@@ -16,7 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-//todo: don't connect to devices that are already peers
+//TODO: don't connect to devices that are already peers
 public class Bluetooth extends BroadcastReceiver implements Measurement {
 
 	public static BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
@@ -37,7 +37,7 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 				Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 				intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				Globals.context.startActivity(intent);
+				Measurer.context.startActivity(intent);
 			}
 			if (!ba.startDiscovery())
 				ba.enable();
@@ -98,7 +98,7 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 		if (rssi != Short.MIN_VALUE)
 			stringBuilder.append("BLUETOOTH: RSSI: " + Integer.toString(rssi) + "\n");
 		
-		Globals.appendToCache(stringBuilder.toString());
+		Measurer.appendToCache(stringBuilder.toString());
 	}
 	
 	void makeConnection(BluetoothDevice device) {

@@ -24,7 +24,6 @@ public class Sound implements Measurement {
 			Log.e("PsychSurveys", "", e);
 		} catch (RuntimeException e) {
 			recorder = null;
-			Log.e("PsychSurveys", "", e);
 		}
 	}
 

@@ -6,6 +6,9 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.*;
 
 class Stop extends TimerTask {
@@ -17,8 +20,12 @@ class Stop extends TimerTask {
 			if (result != null)
 				toWrite.append(result + "\n");
 		}
-		Globals.appendToCache(new String(toWrite));
-		Measurer.wakeLock.release();
+		Measurer.appendToCache(new String(toWrite));
+		if (!Measurer.wakeLock.isHeld()) {
+			Log.e("PsychSurveys", "Unheld wakelock in stop");
+		} else {
+			Measurer.wakeLock.release();
+		}
 	}			
 };
 
@@ -29,9 +36,13 @@ public class Measurer extends MinimalService {
 	
 	@SuppressLint("Wakelock")
 	public void run() {		
-		PowerManager powerManager = (PowerManager) Globals.context.getSystemService(Context.POWER_SERVICE); 
+		Log.i("PsychSurveys", "Starting Measurements");
+		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE); 
     	wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MainService");
         wakeLock.acquire();
+        if (!Measurer.wakeLock.isHeld()) {
+			Log.e("PsychSurveys", "Unheld wakelock in run");
+		}
 		
 		measurements.add(new Bluetooth());
     	measurements.add(new Accel());
@@ -44,4 +55,18 @@ public class Measurer extends MinimalService {
         }
         (new Timer()).schedule(new Stop(), Globals.measureLength);
     }
+	
+	static public void appendToCache(String str) {
+		try {
+			OutputStreamWriter out = new OutputStreamWriter(context.openFileOutput(Globals.cache, Context.MODE_APPEND));
+			String time = "TIME: " + Globals.format.format(System.currentTimeMillis()) + "\n";
+			String rev = "REV: " + Integer.toString(Globals.revisionNumber) + "\n";				
+			out.write(time + rev + str + "\n");
+			out.close();
+		} catch (FileNotFoundException e) {
+			Log.e("PsychSurveys", "", e);
+		} catch (IOException e) {
+			Log.e("PsychSurveys", "", e);
+		}
+	}
 }

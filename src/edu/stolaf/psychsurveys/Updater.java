@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-class Updater extends MinimalService {
+public class Updater extends MinimalService {
 	
 	private String fileName = "PsychSurveys.apk";
-	private String path = Globals.context.getFilesDir().getAbsolutePath() + "/" + fileName;
+	private String path = context.getFilesDir().getAbsolutePath() + "/" + fileName;
 	
 	private Boolean checkForUpdates() throws IOException, InterruptedException {
 		String reply = Globals.execForOutput("curl -f " + Globals.cgi + "?revNo=" + Integer.toString(Globals.revisionNumber));
@@ -35,7 +35,7 @@ class Updater extends MinimalService {
 		intent.setAction(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.parse("file://" + path), "application/vnd.android.package-archive");
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		Globals.context.startActivity(intent);
+		context.startActivity(intent);
 	}
 	
 	public void run() {		
