@@ -3,8 +3,6 @@ package edu.stolaf.psychsurveys;
 import android.util.Log;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,26 +27,13 @@ class Stop extends TimerTask {
 	}			
 };
 
-public class Measurer extends MinimalService {
+public class Measurer extends RepeatingTask {
 
-	public static Vector<Measurement> measurements = new Vector<Measurement>();
-	public static WakeLock wakeLock;
+	private static Measurement[] array = {new Bluetooth(), new Accel(), new Sound(), new Loc()};
+	public static Vector<Measurement> measurements = new Vector<Measurement>(Arrays.asList(array));
 	
 	@SuppressLint("Wakelock")
 	public void run() {		
-		Log.i("PsychSurveys", "Starting Measurements");
-		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE); 
-    	wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MainService");
-        wakeLock.acquire();
-        if (!Measurer.wakeLock.isHeld()) {
-			Log.e("PsychSurveys", "Unheld wakelock in run");
-		}
-		
-		measurements.add(new Bluetooth());
-    	measurements.add(new Accel());
-    	measurements.add(new Sound());
-    	measurements.add(new Loc());
-    	
         Log.i("PsychSurveys", "Revision Number: " + Integer.toString(Globals.revisionNumber));
         for (Measurement measurement : measurements) {
                 measurement.start();

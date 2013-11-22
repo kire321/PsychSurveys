@@ -12,11 +12,6 @@ class Accel implements SensorEventListener, Measurement {
 	SensorManager sensorManager;
 	Sensor accelerometer;
 	
-    public Accel() {
-    	sensorManager = (SensorManager) Measurer.context.getSystemService(Context.SENSOR_SERVICE);
-    	accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-    }
-	
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {}
 
@@ -32,6 +27,8 @@ class Accel implements SensorEventListener, Measurement {
 
 	@Override
 	public void start() {
+		sensorManager = (SensorManager) Measurer.context.getSystemService(Context.SENSOR_SERVICE);
+    	accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sumSquaredDeviations = (float) 0;
     	count = 0;
     	sensorManager.registerListener(this, accelerometer, 1*1000000);

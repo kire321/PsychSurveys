@@ -30,17 +30,20 @@ public class Globals {
 	static final int port = 8000;
 	static final int measureLength = 15*1000;
 	
-	static final int measureFreq = 10 * 60 * 1000; //for production
-	//static final int measureFreq = 30 * 1000; //for testing
-	static final int reportFreq = 24 * 60 * 60 * 1000; //for production
-	//static final int reportFreq = 60 * 1000; //for testing
-	static final int updateFreq = 24 * 60 * 60 * 1000; //for production
-	//static final int updateFreq = 60 * 1000; //for testing
+	//static final int measureFreq = 10 * 60 * 1000; //for production
+	static final int measureFreq = 30 * 1000; //for testing
+	//static final int reportFreq = 24 * 60 * 60 * 1000; //for production
+	static final int reportFreq = 60 * 1000; //for testing
+	//static final int updateFreq = 24 * 60 * 60 * 1000; //for production
+	static final int updateFreq = 60 * 1000; //for testing
+	
+	/*private Measurer measurer = new Measurer();
+	private Reporter reporter = new Reporter();
+	private Updater updater = new Updater();*/
 	
 	void schedule(Class<?> cls, int delay, int period) {
-		Intent intent = new Intent();
-        intent.setClass(context, cls);
-        PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, 0);
+		Intent intent = new Intent(context, cls);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, period, pendingIntent);
 	}
@@ -51,6 +54,21 @@ public class Globals {
 		schedule(Reporter.class, measureFreq, reportFreq);
 		schedule(Updater.class, 0, updateFreq);
 	}
+	
+	/*void schedule(BroadcastReceiver br, int delay, int period) {
+		Intent intent = new Intent(context, br.getClass());
+		context.registerReceiver(br, new IntentFilter());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, period, pendingIntent);
+	}
+	
+	void schedulePsychSurveysComponents() {				
+		Log.i("PsychSurveys", "Starting Components");
+		schedule(measurer, 0, measureFreq);
+		schedule(reporter, measureFreq, reportFreq);
+		schedule(updater, 0, updateFreq);
+	}*/
 	
 	static public Boolean exec(String cmd) {
 		try {

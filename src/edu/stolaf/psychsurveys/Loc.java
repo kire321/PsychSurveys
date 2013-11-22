@@ -16,7 +16,8 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	LocationClient locationClient;
 	LocationRequest locationRequest;
 	
-	public Loc() {
+	@Override
+	public void start() {
 		locationClient = new LocationClient(Measurer.context, this, this);
 		locationClient.connect();
 		locationRequest = LocationRequest.create();
@@ -24,11 +25,7 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 		locationRequest.setFastestInterval(Globals.reportFreq);
 		locationRequest.setInterval(Globals.measureFreq);
 		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-	}
-
-	
-	@Override
-	public void start() {
+		
 		if(locationClient.isConnected()) {
 			Handler handler = new Handler(Measurer.context.getMainLooper());
 			final Loc self = this;
@@ -66,18 +63,12 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	public void onLocationChanged(Location location) {}
 	
 	@Override
-	public void onConnected(Bundle arg0) {
-		Log.i("PsychSurveys", "Service connected");
-	}
+	public void onConnected(Bundle arg0) {}
 
 	@Override
-	public void onDisconnected() {
-		Log.i("PsychSurveys", "Service disconnected");
-	}
+	public void onDisconnected() {}
 	
 	@Override
-	public void onConnectionFailed(ConnectionResult arg0) {
-		Log.i("PsychSurveys", "Connection to service failed");
-	}
+	public void onConnectionFailed(ConnectionResult arg0) {}
 
 }

@@ -35,9 +35,10 @@
             </intent-filter>
         </receiver>        
 
-        <service android:enabled="true" android:name="edu.stolaf.psychsurveys.Measurer" />
-        <service android:enabled="true" android:name="edu.stolaf.psychsurveys.Updater" />
-        <service android:enabled="true" android:name="edu.stolaf.psychsurveys.Reporter" />        
+        <receiver android:name="edu.stolaf.psychsurveys.Measurer"></receiver>
+        <receiver android:name="edu.stolaf.psychsurveys.Reporter"></receiver>
+        <receiver android:name="edu.stolaf.psychsurveys.Updater"></receiver>
+               
         <activity
             android:name="edu.stolaf.psychsurveys.MainActivity"
             android:label="@string/title_activity_main" >
