@@ -3,7 +3,6 @@ package edu.stolaf.psychsurveys;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -44,17 +43,17 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 		if(locationClient.isConnected()) {			
 			Location location = locationClient.getLastLocation();
 			if(location == null) {
-				Log.i("PsychSurveys", "No location.");
+				Measurer.info("No location.");
 				return "LOC: no location available.";
 			} else {
-				Log.i("PsychSurveys", "Location available.");				
+				Measurer.info("Location available.");				
 				String loctime = "LOCTIME: " + Globals.format.format(location.getTime()) + "\n";
 				String lat = "LAT: " + Double.toString(location.getLatitude()) + "\n";
 				String lon = "LON: " + Double.toString(location.getLongitude());	
 				return loctime + lat + lon;
 			}
 		} else {
-			Log.i("PsychSurveys", "Service not connected.");
+			Measurer.info("Service not connected.");
 			return "LOC: Service not connected.";
 		}
 	}

@@ -14,7 +14,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 //TODO: don't connect to devices that are already peers
 public class Bluetooth extends BroadcastReceiver implements Measurement {
@@ -30,7 +29,7 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 		phones = 0;
 		if (ba != null) {
 			if (ba.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE && !server.isAlive()) {
-				Log.i("PsychSurveys", "Starting server");
+				Measurer.info("Starting server");
 				server.start();
 			}
 			if (ba.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
@@ -54,31 +53,35 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		String action = intent.getAction();
-		if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-			cacheDeviceInfo(intent);
-			
-			BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			if (device.getBondState() == BluetoothDevice.BOND_BONDED)
-				makeConnection(device);
-			else if (device.getBondState() == BluetoothDevice.BOND_NONE) {
-				try {
-					Method method = device.getClass().getMethod("createBond", (Class[]) null);
-					Boolean bondFailed = ! (Boolean) method.invoke(device, (Object[]) null);
-					if (bondFailed)
-						Log.e("PsychSurveys", "Bond failed!");
-				} catch (Exception e) {
-					Log.e("PsychSurveys", "", e);
-				}
-			}
-		} else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-			int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1); 
-			if (bondState == BluetoothDevice.BOND_BONDED) {
+		try {
+			String action = intent.getAction();
+			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+				cacheDeviceInfo(intent);
+				
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				makeConnection(device);
+				if (device.getBondState() == BluetoothDevice.BOND_BONDED)
+					makeConnection(device);
+				else if (device.getBondState() == BluetoothDevice.BOND_NONE) {
+					try {
+						Method method = device.getClass().getMethod("createBond", (Class[]) null);
+						Boolean bondFailed = ! (Boolean) method.invoke(device, (Object[]) null);
+						if (bondFailed)
+							Measurer.error("Bond failed!");
+					} catch (Exception e) {
+						Measurer.error("", e);
+					}
+				}
+			} else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+				int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1); 
+				if (bondState == BluetoothDevice.BOND_BONDED) {
+					BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+					makeConnection(device);
+				}
+			} else {
+				Measurer.error("Unknown intent");
 			}
-		} else {
-			Log.e("PsuchSurveys", "Unknown intent");
+		} catch (Exception e) {
+			Measurer.dragnet(e);
 		}
 	}
 	
@@ -104,9 +107,9 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 	void makeConnection(BluetoothDevice device) {
 		if (!nonPeers.contains(device.getAddress())) {
 			if (device.getAddress().compareTo(ba.getAddress()) > 0) {
-				Log.i("PsychSurveys", "Waiting for connection from " + device.getAddress());
+				Measurer.info("Waiting for connection from " + device.getAddress());
 			} else {
-				Log.i("PsychSurveys", "Connecting to " + device.getAddress());
+				Measurer.info("Connecting to " + device.getAddress());
 				(new Client(device)).start();
 			}
 		}
@@ -120,12 +123,14 @@ class Server extends Thread {
 			while (true) {
 				BluetoothSocket socket = serverSocket.accept();
 				if (socket == null)
-					Log.e("PsychSurveys", "Null server side socket");
-				Log.i("PsychSurveys", "Connection accepted");
+					Measurer.error("Null server side socket");
+				Measurer.info("Connection accepted");
 			}
 		} catch (IOException e) {
-			Log.e("PsychSurveys", "", e);
-		} 		
+			Measurer.error("", e);
+		} catch (Exception e) {
+			Measurer.dragnet(e);
+		}
 	}
 }
 
@@ -140,14 +145,16 @@ class Client extends Thread {
 		try {
 			BluetoothSocket socket = device.createInsecureRfcommSocketToServiceRecord(Bluetooth.uuid);
 			if (Bluetooth.ba.isDiscovering())
-				Log.i("PsychSurveys", "Discovery cancelled");
+				Measurer.info("Discovery cancelled");
 			Bluetooth.ba.cancelDiscovery();
 			socket.connect();
-			Log.i("PsychSurveys", "Connection successful");
+			Measurer.info("Connection successful");
 			socket.close();
 		} catch (IOException e) {
-			Log.e("PsychSurveys", "", e);
+			Measurer.error("", e);
 			Bluetooth.nonPeers.add(device.getAddress());
+		}  catch (Exception e) {
+			Measurer.dragnet(e);
 		} 		
 	}
 }

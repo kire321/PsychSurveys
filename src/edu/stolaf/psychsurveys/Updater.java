@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 public class Updater extends RepeatingTask {
 	
@@ -12,22 +11,22 @@ public class Updater extends RepeatingTask {
 	private String path;
 	
 	private Boolean checkForUpdates() throws IOException, InterruptedException {
-		String reply = Globals.execForOutput("curl -f " + Globals.cgi + "?revNo=" + Integer.toString(Globals.revisionNumber));
+		String reply = execForOutput("curl -f " + Globals.cgi + "?revNo=" + Integer.toString(Globals.revisionNumber));
 		if(reply.equals("No update.\n\n")) {
-			Log.i("PsychSurveys", "No update.");
+			info("No update.");
 			return false;
 		} else if(reply.equals("Update.\n\n")) {
-			Log.i("PsychSurveys", "Updating.");
+			info("Updating.");
 			return true;
 		} else {
-			Log.e("PyschSurveys", "Unknown reply from server\n" + reply);
+			error("Unknown reply from server\n" + reply);
 			throw new IOException("Unknown reply from server");
 		}
 	}
 	
 	private void downloadUpdates() throws IOException, InterruptedException {		
-		Globals.exec("curl -f " + Globals.url + fileName + " -o " + path); 
-		Globals.exec("chmod 666 " + path);
+		exec("curl -f " + Globals.url + fileName + " -o " + path); 
+		exec("chmod 666 " + path);
 	}
 	
 	private void installUpdates() {
@@ -46,9 +45,9 @@ public class Updater extends RepeatingTask {
 				installUpdates();
 			}
 		} catch (IOException e) {
-			Log.e("PsychSurveys", "", e);
+			error("", e);
 		} catch (InterruptedException e) {
-			Log.e("PsychSurveys", "", e);
+			error("", e);
 		}
 		wakeLock.release();
 	}

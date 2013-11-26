@@ -3,7 +3,6 @@ package edu.stolaf.psychsurveys;
 import java.io.IOException;
 
 import android.media.MediaRecorder;
-import android.util.Log;
 
 public class Sound implements Measurement {
 	MediaRecorder recorder;
@@ -21,7 +20,7 @@ public class Sound implements Measurement {
 			recorder.getMaxAmplitude();
 		} catch (IOException e) {
 			recorder = null;
-			Log.e("PsychSurveys", "", e);
+			Measurer.error("", e);
 		} catch (RuntimeException e) {
 			recorder = null;
 		}

@@ -17,12 +17,16 @@ class Accel implements SensorEventListener, Measurement {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		final Float x = event.values[0];
-		final Float y = event.values[1];
-		final Float z = event.values[2];
-		final Float deviation = (float) (Math.sqrt(x*x + y*y + z*z) - 9.8); 
-		sumSquaredDeviations += deviation*deviation;
-		count += 1;
+		try {
+			final Float x = event.values[0];
+			final Float y = event.values[1];
+			final Float z = event.values[2];
+			final Float deviation = (float) (Math.sqrt(x*x + y*y + z*z) - 9.8); 
+			sumSquaredDeviations += deviation*deviation;
+			count += 1;
+		} catch (Exception e) {
+			Measurer.dragnet(e);
+		}
 	}
 
 	@Override
