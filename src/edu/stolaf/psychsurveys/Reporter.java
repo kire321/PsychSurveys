@@ -1,12 +1,23 @@
 package edu.stolaf.psychsurveys;
 
+import java.io.FileInputStream;
+
+import com.loopj.android.http.*;
+
 public class Reporter extends RepeatingTask {
 	
-	public void run() {		
-		String cache = context.getFilesDir().getAbsolutePath() + "/" + Globals.cache;
-		if (exec("curl -f --data-binary @" + cache + " " + Globals.cgi))
-			if( ! context.deleteFile(Globals.cache))
-	        	error("Could not delete cache");
-		wakeLock.release();
+	public void run() throws Exception {		
+		RequestParams params = new RequestParams();
+		final FileInputStream in = context.openFileInput(Globals.cache);
+		params.put("key", in);
+		AsyncHttpClient client = new AsyncHttpClient();
+		client.post(Globals.cgi, params, new ExceptionHandlingResponseHandler(wakeLock) {
+			public void handle(String response) throws Exception {
+				in.close();
+				if( ! context.deleteFile(Globals.cache))
+		        	error("Could not delete cache");
+				wakeLock.release();									
+			}
+		});					
     }
 }

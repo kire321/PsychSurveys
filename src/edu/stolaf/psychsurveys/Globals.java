@@ -18,20 +18,20 @@ public class Globals {
 	}
 	
 	static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
-	static final int revisionNumber = 3;
+	static final int revisionNumber = 2;
 	static final String cache = "PsychSurveys.cache";
-	static final String url = "www.cs.stolaf.edu/projects/sensors/";
+	static final String url = "http://www.cs.stolaf.edu/projects/sensors/";
 	static final String cgi = url + "backend.cgi";
 	static final String ip = "192.168.1.5";
 	static final int port = 8000;
 	static final int measureLength = 15*1000;
 	
-	static final int measureFreq = 10 * 60 * 1000; //for production
-	//static final int measureFreq = 30 * 1000; //for testing
-	static final int reportFreq = 60 * 60 * 1000; //for production
-	//static final int reportFreq = 60 * 1000; //for testing
-	static final int updateFreq = 60 * 60 * 1000; //for production
-	//static final int updateFreq = 60 * 1000; //for testing
+	//static final int measureFreq = 10 * 60 * 1000; //for production
+	static final int measureFreq = 30 * 1000; //for testing
+	//static final int reportFreq = 60 * 60 * 1000; //for production
+	static final int reportFreq = 60 * 1000; //for testing
+	//static final int updateFreq = 60 * 60 * 1000; //for production
+	static final int updateFreq = 60 * 1000; //for testing
 	
 	/*private Measurer measurer = new Measurer();
 	private Reporter reporter = new Reporter();
