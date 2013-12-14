@@ -31,6 +31,11 @@ public abstract class RepeatingTask extends BroadcastReceiver {
 		Log.e(tag, msg);
 	}
 	
+	public static void error(String msg, Throwable t, Context c) {
+		appendToCache(msg + "\n" + Log.getStackTraceString(t) + "\n", c);
+		Log.e(tag, msg, t);		
+	}
+	
 	public static void error(String msg, Throwable t) {
 		appendToCache(msg + "\n" + Log.getStackTraceString(t) + "\n");
 		Log.e(tag, msg, t);		
@@ -40,17 +45,25 @@ public abstract class RepeatingTask extends BroadcastReceiver {
 		error("Dragnet exception handling", t);
 	}
 	
+	public static void dragnet(Throwable t, Context c) {
+		error("Dragnet exception handling", t, c);
+	}
+	
 	static public void appendToCache(String str) {
+		appendToCache(str, context);
+	}
+	
+	static public void appendToCache(String str, Context c) {
 		try {
-			OutputStreamWriter out = new OutputStreamWriter(context.openFileOutput(Globals.cache, Context.MODE_APPEND));
+			OutputStreamWriter out = new OutputStreamWriter(c.openFileOutput(Globals.cache, Context.MODE_APPEND));
 			String time = "TIME: " + Globals.format.format(System.currentTimeMillis()) + "\n";
 			String rev = "REV: " + Integer.toString(Globals.revisionNumber) + "\n";				
 			out.write(time + rev + str + "\n");
 			out.close();
 		} catch (FileNotFoundException e) {
-			error("", e);
+			Log.e(tag, "", e);
 		} catch (IOException e) {
-			error("", e);
+			Log.e(tag, "", e);
 		}
 	}
 	

@@ -46,7 +46,7 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 				Measurer.error("Unknown intent");
 			}
 		} catch (Exception e) {
-			Measurer.dragnet(e);
+			Measurer.dragnet(e, context);
 		}
 	}
 	

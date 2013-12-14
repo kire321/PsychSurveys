@@ -14,27 +14,13 @@ public class ExceptionHandlingResponseHandler extends AsyncHttpResponseHandler {
 		wakeLock = wl;
 	}
 	
-	public void handle(String response) throws Exception {
-		RepeatingTask.error("Default implementation of string overload called");
-	};
-	public void handle(int statusCode, org.apache.http.Header[] headers, byte[] responseBody) throws Exception {
-		RepeatingTask.error("Default implementation of byte array overload called");
-	};
-	
-	public void onSuccess(String response) {
-		try {
-			RepeatingTask.info("string onSuccess called");
-			handle(response);
-		} catch (Exception e) {
-			RepeatingTask.dragnet(e);
-			wakeLock.release();
-		}
-	}
+	public void handle(String response) throws Exception {};
+	public void handle(int statusCode, org.apache.http.Header[] headers, byte[] responseBody) throws Exception {};
 	
 	public void onSuccess(int statusCode, org.apache.http.Header[] headers, byte[] responseBody) {
 		try {
-			RepeatingTask.info("bytearray onSuccess called");
 			handle(statusCode, headers, responseBody);
+			handle(new String(responseBody));
 		} catch (Exception e) {
 			RepeatingTask.dragnet(e);
 			wakeLock.release();
