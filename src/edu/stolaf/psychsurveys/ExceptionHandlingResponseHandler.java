@@ -17,18 +17,26 @@ public class ExceptionHandlingResponseHandler extends AsyncHttpResponseHandler {
 	public void handle(String response) throws Exception {};
 	public void handle(int statusCode, org.apache.http.Header[] headers, byte[] responseBody) throws Exception {};
 	
+	public void releaseWakeLock() {
+		if (wakeLock.isHeld()) {
+			wakeLock.release();
+		} else {			
+			RepeatingTask.error("Unheld wakelock");
+		}
+	}
+	
 	public void onSuccess(int statusCode, org.apache.http.Header[] headers, byte[] responseBody) {
 		try {
 			handle(statusCode, headers, responseBody);
 			handle(new String(responseBody));
 		} catch (Exception e) {
 			RepeatingTask.dragnet(e);
-			wakeLock.release();
+			releaseWakeLock();
 		}
 	}
 	
 	public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable throwable) {
-		wakeLock.release();
+		releaseWakeLock();
 		RepeatingTask.error("Status code " + Integer.toString(statusCode), throwable);
 	}
 }

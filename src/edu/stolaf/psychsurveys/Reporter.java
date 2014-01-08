@@ -16,7 +16,7 @@ public class Reporter extends RepeatingTask {
 				in.close();
 				if( ! context.deleteFile(Globals.cache))
 		        	error("Could not delete cache");
-				wakeLock.release();									
+				releaseWakeLock();									
 			}
 		});					
     }
