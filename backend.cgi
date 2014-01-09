@@ -4,6 +4,8 @@ import os
 import traceback
 import sys
 from time import localtime
+import json
+import surveys
 
 revNo = 2
 
@@ -36,7 +38,7 @@ with open("log.txt", "a") as f:
                 reply("\nNo update.")
         elif method == "POST" and len(query) == 1:
             if query[0] == "survey":
-                reply("\nWhat is your favorite color?")
+                reply("\n" + json.dumps(surveys.testQuestion.__dict__))
             else:
                 f.write(sys.stdin.read() + "\n")
                 reply("Status: 200 Success")

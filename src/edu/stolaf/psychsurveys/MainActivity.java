@@ -1,7 +1,11 @@
 package edu.stolaf.psychsurveys;
 
+import java.util.ArrayList;
+
 import android.widget.LinearLayout.LayoutParams;
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -24,11 +28,25 @@ public class MainActivity extends Activity {
                         LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
                 marginParams.leftMargin = 16;
                 marginParams.topMargin = 16;
-
-                String reply = getSharedPreferences(RepeatingTask.tag, 0).getString(Globals.question, "default");                
+          
+                SharedPreferences prefs = getSharedPreferences(RepeatingTask.tag, 0);
+                String reply = prefs.getString(Globals.question, "");
+                Editor editor = prefs.edit();
+                editor.remove(Globals.question);
+                editor.commit();
+                
+                //TODO: split into main/survey activities
+                
+                String question = "Thanks for manually starting Psych Surveys. We're now reporting back to the researchers.";
+                ArrayList<String> answers = new ArrayList<String>();
+                
+                if ( ! reply.equals("")) {
+                	//parse json
+                	question = reply;
+                }
                 
                 TextView tv = new TextView(this);
-                tv.setText(reply);
+                tv.setText(question);
                 tv.setLayoutParams(marginParams);
                 linLayout.addView(tv);
                 
