@@ -45,7 +45,7 @@ class Stop extends TimerTask {
 						NotificationCompat.Builder builder = new NotificationCompat.Builder(Measurer.context)
 							.setSmallIcon(R.drawable.ic_launcher)  
 					        .setContentTitle("Take a Survey");  
-						Intent notifyIntent = new Intent(Measurer.context, MainActivity.class);
+						Intent notifyIntent = new Intent(Measurer.context, SurveyActivity.class);
 						notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						PendingIntent contentIntent = PendingIntent.getActivity(Measurer.context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 						builder.setContentIntent(contentIntent);
@@ -58,6 +58,7 @@ class Stop extends TimerTask {
 						builder.setStyle(new NotificationCompat.InboxStyle());  
 						NotificationManager mNotificationManager = (NotificationManager) Measurer.context.getSystemService(Context.NOTIFICATION_SERVICE);
 						mNotificationManager.notify(1, builder.build());
+						releaseWakeLock();
 					}
 				}
 			});

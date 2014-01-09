@@ -39,11 +39,9 @@ public class Globals {
 	
 	void schedule(Class<?> cls, int delay, int period) {
 		Intent intent = new Intent(context, cls);
-		if (PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE) == null) {
-	        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, period, pendingIntent);
-		}
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, period, pendingIntent);
 	}
 	
 	void schedulePsychSurveysComponents() {				
