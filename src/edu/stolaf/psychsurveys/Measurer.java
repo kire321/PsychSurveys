@@ -32,8 +32,7 @@ class Stop extends TimerTask {
 			
 			RequestParams params = new RequestParams();
 			params.put("key", toReport);
-			AsyncHttpClient client = new AsyncHttpClient();
-			client.post(Globals.cgi + "?survey", params, new ExceptionHandlingResponseHandler(Measurer.wakeLock) {
+			Globals.client.post(Globals.cgi + "?survey", params, new ExceptionHandlingResponseHandler(Measurer.wakeLock) {
 				public void handle(String response) throws Exception {									
 					if(response.equals("No survey.\n\n")) {
 						Measurer.info("No survey.");

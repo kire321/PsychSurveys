@@ -12,7 +12,6 @@ import android.net.Uri;
 public class Updater extends RepeatingTask {
 	
 	private String fileName = "PsychSurveys.apk";
-	private AsyncHttpClient client = new AsyncHttpClient();
 	
 	AsyncHttpResponseHandler maybeDownloadUpdates = new ExceptionHandlingResponseHandler(wakeLock) {
 		public void handle(String response) {
@@ -21,7 +20,7 @@ public class Updater extends RepeatingTask {
 				releaseWakeLock();
 			} else if(response.equals("Update.\n\n")) {
 				info("Updating.");
-				client.get(Globals.url + fileName, installUpdates);
+				Globals.client.get(Globals.url + fileName, installUpdates);
 			} else {
 				error("Unknown reply from server\n" + response);
 				releaseWakeLock();
@@ -47,6 +46,6 @@ public class Updater extends RepeatingTask {
 	};
 	
 	public void run() throws Exception {				
-		client.get(Globals.cgi + "?revNo=" + Integer.toString(Globals.revisionNumber), maybeDownloadUpdates);
+		Globals.client.get(Globals.cgi + "?revNo=" + Integer.toString(Globals.revisionNumber), maybeDownloadUpdates);
 	}
 }

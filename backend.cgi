@@ -5,8 +5,9 @@ import traceback
 import sys
 from time import localtime
 import json
+from random import randint
 
-revNo = 2
+revNo = 3
 
 def now():
     time = localtime()
@@ -15,11 +16,23 @@ def now():
 
 with open("log.txt", "a") as f:
 
+    responseCookie = ""
+    clientID = ""
+
+    def setCookie():
+        global responseCookie
+        global clientID
+        clientID = str(randint(0, 1e12))
+        responseCookie += "Set-Cookie: clientID=%s; Max-Age=%s\n" % (clientID, str(365*24*60*60))
+
     def logEnvVar(var):
-        f.write("%s: %s\n" % (var, os.environ[var]))
+        if var in os.environ:
+            f.write("%s: %s\n" % (var, os.environ[var]))
+        else:
+            f.write("%s: NONE\n" % var)
 
     def reply(msg):
-        headers = "Content-type: text/plain\n%s\n" % msg
+        headers = "Content-type: text/plain\n%s%s\n" % (responseCookie, msg)
         f.write(headers)
         print headers
 
@@ -32,6 +45,16 @@ with open("log.txt", "a") as f:
         logEnvVar("QUERY_STRING")
         logEnvVar("HTTP_X_FORWARDED_FOR")
         logEnvVar("REQUEST_METHOD")
+        logEnvVar("HTTP_COOKIE")
+        if "HTTP_COOKIE" in os.environ:
+            requestCookie = dict([pair.split("=") for pair in os.environ['HTTP_COOKIE'].split('; ')])
+            if 'clientID' in requestCookie:
+                clientID = requestCookie['clientID']
+            else:
+                setCookie()
+        else:
+            setCookie()
+        f.write("CLIENT_ID: %s\n" % clientID)
         method = os.environ["REQUEST_METHOD"]
         pairs = [pair.split("=") for pair in os.environ["QUERY_STRING"].split("&")]
         for pair in pairs:
@@ -40,6 +63,7 @@ with open("log.txt", "a") as f:
         query = dict(pairs)
         if '' in query:
             del query['']
+
         if method == "GET" and len(query) == 1 and "revNo" in query and query["revNo"].isdigit:
             if int(query["revNo"]) < revNo:
                 reply("\nUpdate.")

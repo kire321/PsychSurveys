@@ -5,6 +5,9 @@ import java.util.Locale;
 
 import org.json.JSONObject;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.PersistentCookieStore;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -18,11 +21,12 @@ public class Globals {
 	public Globals(Context con) {
 		context = con;
 	}
-	
-	public static JSONObject json;
 		
+	public static JSONObject json;
+	public static AsyncHttpClient client = new AsyncHttpClient();
+	
 	static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
-	static final int revisionNumber = 2;
+	static final int revisionNumber = 3;
 	static final String cache = "PsychSurveys.cache";
 	static final String url = "http://www.cs.stolaf.edu/projects/sensors/";
 	static final String cgi = url + "backend.cgi";
@@ -49,6 +53,7 @@ public class Globals {
 	
 	void schedulePsychSurveysComponents() {				
 		Log.i("PsychSurveys", "Starting Components");
+		client.setCookieStore(new PersistentCookieStore(context));
 		schedule(Measurer.class, 0, measureFreq);
 		schedule(Reporter.class, measureFreq, reportFreq);
 		schedule(Updater.class, 0, updateFreq);

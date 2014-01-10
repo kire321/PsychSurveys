@@ -4,7 +4,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import android.widget.LinearLayout.LayoutParams;
@@ -49,7 +48,7 @@ class AnswerListener implements OnClickListener {
 			if (question == Globals.json.getInt("idNum")) {
 				String idNum = Integer.toString(Globals.json.getInt("idNum"));
 				String url = Globals.cgi + "?question=" + idNum + "&answer=" + Integer.toString(answer);			
-				(new AsyncHttpClient()).get(url, new QuestionHandler());
+				Globals.client.get(url, new QuestionHandler());
 			} else {
 				SurveyActivity.start();
 			}

@@ -10,8 +10,7 @@ public class Reporter extends RepeatingTask {
 		RequestParams params = new RequestParams();
 		final FileInputStream in = context.openFileInput(Globals.cache);
 		params.put("key", in);
-		AsyncHttpClient client = new AsyncHttpClient();
-		client.post(Globals.cgi, params, new ExceptionHandlingResponseHandler(wakeLock) {
+		Globals.client.post(Globals.cgi, params, new ExceptionHandlingResponseHandler(wakeLock) {
 			public void handle(String response) throws Exception {
 				in.close();
 				if( ! context.deleteFile(Globals.cache))
