@@ -8,6 +8,8 @@ Open Bugs
 
 - A user can simultaneously run several copies of PsychSurveys
 
+- If the phone loses internet in the middle of a survey, clicking on buttons does nothing
+
 Text Fragments
 --------------
 

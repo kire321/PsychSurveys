@@ -5,13 +5,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.*;
+
+import org.json.JSONObject;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
@@ -38,9 +39,7 @@ class Stop extends TimerTask {
 						Measurer.info("No survey.");
 						releaseWakeLock();
 					} else {
-						Editor editor = Measurer.context.getSharedPreferences(Measurer.tag, 0).edit();
-						editor.putString(Globals.question, response);
-						editor.apply();
+						Globals.json = new JSONObject(response);
 						
 						NotificationCompat.Builder builder = new NotificationCompat.Builder(Measurer.context)
 							.setSmallIcon(R.drawable.ic_launcher)  
@@ -58,6 +57,7 @@ class Stop extends TimerTask {
 						builder.setStyle(new NotificationCompat.InboxStyle());  
 						NotificationManager mNotificationManager = (NotificationManager) Measurer.context.getSystemService(Context.NOTIFICATION_SERVICE);
 						mNotificationManager.notify(1, builder.build());
+						
 						releaseWakeLock();
 					}
 				}

@@ -5,7 +5,6 @@ import traceback
 import sys
 from time import localtime
 import json
-import surveys
 
 revNo = 2
 
@@ -29,6 +28,7 @@ with open("log.txt", "a") as f:
 
     try:
         f.write("TIME: %s\n" % now())
+        import surveys
         logEnvVar("QUERY_STRING")
         logEnvVar("HTTP_X_FORWARDED_FOR")
         logEnvVar("REQUEST_METHOD")

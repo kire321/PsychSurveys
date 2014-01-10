@@ -3,6 +3,8 @@ package edu.stolaf.psychsurveys;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import org.json.JSONObject;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -17,7 +19,8 @@ public class Globals {
 		context = con;
 	}
 	
-	static final String question = "question";
+	public static JSONObject json;
+		
 	static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
 	static final int revisionNumber = 2;
 	static final String cache = "PsychSurveys.cache";
