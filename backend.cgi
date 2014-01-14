@@ -19,17 +19,17 @@ with open("log.txt", "a") as f:
     responseCookie = ""
     clientID = ""
 
-    def setCookie():
+    def setCookie(key, value):
         global responseCookie
+        responseCookie += "Set-Cookie: %s=%s; Max-Age=%s\n" % (key, value, str(365*24*60*60))
+
+    def setClientID():
         global clientID
         clientID = str(randint(0, 1e12))
-        responseCookie += "Set-Cookie: clientID=%s; Max-Age=%s\n" % (clientID, str(365*24*60*60))
+        setCookie("clientID", clientID)
 
     def logEnvVar(var):
-        if var in os.environ:
-            f.write("%s: %s\n" % (var, os.environ[var]))
-        else:
-            f.write("%s: NONE\n" % var)
+        f.write("%s: %s\n" % (var, os.environ[var]))
 
     def reply(msg):
         headers = "Content-type: text/plain\n%s%s\n" % (responseCookie, msg)
@@ -42,19 +42,22 @@ with open("log.txt", "a") as f:
     try:
         f.write("TIME: %s\n" % now())
         import surveys
+        from tabulate import tabulate
         logEnvVar("QUERY_STRING")
         logEnvVar("HTTP_X_FORWARDED_FOR")
         logEnvVar("REQUEST_METHOD")
-        logEnvVar("HTTP_COOKIE")
         if "HTTP_COOKIE" in os.environ:
-            requestCookie = dict([pair.split("=") for pair in os.environ['HTTP_COOKIE'].split('; ')])
+            pairs = os.environ['HTTP_COOKIE'].split('; ')
+            indices = map(lambda pair: pair.find('='), pairs)
+            requestCookie = dict([(pair[:index], pair[index+1:]) for pair, index in zip(pairs, indices)])
+            for key, value in requestCookie.items():
+                f.write("%s: %s\n" % (key, value))
             if 'clientID' in requestCookie:
                 clientID = requestCookie['clientID']
             else:
-                setCookie()
+                setClientID()
         else:
-            setCookie()
-        f.write("CLIENT_ID: %s\n" % clientID)
+            setClientID()
         method = os.environ["REQUEST_METHOD"]
         pairs = [pair.split("=") for pair in os.environ["QUERY_STRING"].split("&")]
         for pair in pairs:
@@ -64,20 +67,24 @@ with open("log.txt", "a") as f:
         if '' in query:
             del query['']
 
-        if method == "GET" and len(query) == 1 and "revNo" in query and query["revNo"].isdigit:
-            if int(query["revNo"]) < revNo:
-                reply("\nUpdate.")
+        with open("secret") as secret:
+            if method == "GET" and len(query) == 1 and "revNo" in query and query["revNo"].isdigit:
+                if int(query["revNo"]) < revNo:
+                    reply("\nUpdate.")
+                else:
+                    reply("\nNo update.")
+            elif method == "POST" and len(query) == 1 and "survey" in query and query["survey"] == "":
+                setCookie("survey", str(randint(0,1e12)))
+                sendQuestion(surveys.testQuestion)
+            elif method == "POST" and len(query) == 0:
+                f.write(sys.stdin.read() + "\n")
+                reply("Status: 200 Success")
+            elif method == "GET" and len(query) == 2 and "question" in query and "answer" in query and query["question"].isdigit and query["answer"].isdigit:
+                sendQuestion(surveys.Question.questions[int(query["question"])][int(query["answer"])])
+            elif method == "GET" and len(query) == 1 and "tabulate" in query and query["tabulate"] == secret.read().rstrip():
+                reply("\n%s" % tabulate())
             else:
-                reply("\nNo update.")
-        elif method == "POST" and len(query) == 1 and "survey" in query and query["survey"] == "":
-            sendQuestion(surveys.testQuestion)
-        elif method == "POST" and len(query) == 0:
-            f.write(sys.stdin.read() + "\n")
-            reply("Status: 200 Success")
-        elif method == "GET" and len(query) == 2 and "question" in query and "answer" in query and query["question"].isdigit and query["answer"].isdigit:
-            sendQuestion(surveys.Question.questions[int(query["question"])][int(query["answer"])])
-        else:
-            reply("Status: 400 Bad Request")
+                reply("Status: 400 Bad Request")
     except:
         traceback.print_exc(file=f)
         sys.exit(1)
