@@ -39,8 +39,8 @@ class Accel implements SensorEventListener, Measurement {
 	}
 
 	@Override
-	public String stop() {
+	public void stop() throws Exception {
 		sensorManager.unregisterListener(this);
-		return "ACCEL: " + Float.toString(sumSquaredDeviations/count);
+		Measurer.toUpload.put("accel", sumSquaredDeviations/count);
 	}
 }

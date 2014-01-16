@@ -29,11 +29,9 @@ public class Bluetooth extends BroadcastReceiver implements Measurement {
 	}
 
 	@Override
-	public String stop() {
-		if (ba == null)
-			return "BLUETOOTH: Device does not support bluetooth.";
-		else
-			return "BLUETOOTH: PHONE_COUNT: " + Integer.toString(phones); //Assuming no rediscovery, this is wrong
+	public void stop() throws Exception {
+		if (ba != null)
+			Measurer.toUpload.put("phoneCount", phones); //Assuming no rediscovery, this is wrong
 	}
 
 	@Override

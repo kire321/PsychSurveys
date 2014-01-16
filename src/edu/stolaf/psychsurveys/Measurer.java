@@ -12,27 +12,19 @@ import android.support.v4.app.NotificationCompat;
 
 import java.util.*;
 
+import org.apache.http.entity.StringEntity;
 import org.json.JSONObject;
-
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.RequestParams;
 
 class Stop extends TimerTask {
 	
 	public void run() {
 		try {
-			StringBuffer buf = new StringBuffer();								
 			for (Measurement measurement : Measurer.measurements) {
-				String result = measurement.stop();
-				if (result != null)
-					buf.append(result + "\n");
+				measurement.stop();
 			}
-			String toReport = new String(buf);
-			Measurer.appendToCache(toReport);
 			
-			RequestParams params = new RequestParams();
-			params.put("key", toReport);
-			Globals.client.post(Globals.cgi + "?survey", params, new ExceptionHandlingResponseHandler(Measurer.wakeLock) {
+			Measurer.toUpload.put("revNo", Globals.revisionNumber);
+			Globals.client.post(Measurer.context, Globals.cgi + "?survey", new StringEntity(Measurer.toUpload.toString()), "application/json", new ExceptionHandlingResponseHandler(Measurer.wakeLock) {
 				public void handle(String response) throws Exception {									
 					if(response.equals("No survey.\n\n")) {
 						Measurer.info("No survey.");
@@ -73,6 +65,7 @@ public class Measurer extends RepeatingTask {
 
 	private static Measurement[] array = {new Bluetooth(), new Accel(), new Sound(), new Loc()};
 	public static Vector<Measurement> measurements = new Vector<Measurement>(Arrays.asList(array));
+	public static JSONObject toUpload = new JSONObject();
 	
 	@SuppressLint("Wakelock")
 	public void run() {		

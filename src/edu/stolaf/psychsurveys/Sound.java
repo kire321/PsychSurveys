@@ -27,14 +27,11 @@ public class Sound implements Measurement {
 	}
 
 	@Override
-	public String stop() {
-		if(recorder == null) {
-			return "Error recording sound.";
-		} else {
-			String sound = "SOUND: " + Integer.toString(recorder.getMaxAmplitude());
+	public void stop() throws Exception {
+		if(recorder != null) {
+			Measurer.toUpload.put("sound", recorder.getMaxAmplitude());
 			recorder.stop();
 			recorder.release();
-			return sound;
 		}
 	}
 

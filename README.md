@@ -1,14 +1,30 @@
 PsychSurveys
 ============
 
-Open Bugs
----------
+Open Bugs/Technical Debt
+------------------------
 
-- If a user changes IPs, we cannot reliably tell that they are the same person
+- phoneCount is always zero, even though Bluetooth usually detects several phones in crowded public cases
 
 - A user can simultaneously run several copies of PsychSurveys
 
 - If the phone loses internet in the middle of a survey, clicking on buttons does nothing
+
+- Security: Anyone who knows the URL can view the survey responses.
+
+- Security: The log file and the url for viewing survey responses are readable by all users.
+
+- The log parser is slow (when using old.log, client times out when asking if it should start a survey)
+
+- The log parser is not very general
+
+- The log parser uses introspection
+
+shemas.py
+---------
+
+- If a question has no answers, the client will add an "Exit PsychSurveys" button
+
 
 Text Fragments
 --------------

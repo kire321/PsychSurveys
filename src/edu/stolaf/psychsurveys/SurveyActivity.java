@@ -87,10 +87,23 @@ public class SurveyActivity extends Activity {
             linLayout.addView(tv);            
             
 			JSONArray answers = Globals.json.getJSONArray("answers");
+			if (answers.length() == 0) {
+				Button btn = new Button(this);
+		        btn.setText("Close PsychSurveys");		        		       
+		        btn.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View view) {
+						Intent startMain = new Intent(Intent.ACTION_MAIN);
+				        startMain.addCategory(Intent.CATEGORY_HOME);
+				        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				        startActivity(startMain);
+					}});
+		        linLayout.addView(btn);
+			}
 			for (int i=0; i < answers.length(); i++) {
 				Button btn = new Button(this);
-		        btn.setText(answers.getString(i));
-		        //btn.setLayoutParams(marginParams);		        		       
+		        btn.setText(answers.getString(i));		        		       
 		        btn.setOnClickListener(new AnswerListener(i, Globals.json.getInt("idNum")));
 		        linLayout.addView(btn);
 			}

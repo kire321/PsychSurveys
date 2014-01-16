@@ -39,22 +39,17 @@ public class Loc implements Measurement, ConnectionCallbacks, OnConnectionFailed
 	}
 
 	@Override
-	public String stop() {
+	public void stop() throws Exception {
 		if(locationClient.isConnected()) {			
 			Location location = locationClient.getLastLocation();
 			if(location == null) {
 				Measurer.info("No location.");
-				return "LOC: no location available.";
 			} else {
-				Measurer.info("Location available.");				
-				String loctime = "LOCTIME: " + Globals.format.format(location.getTime()) + "\n";
-				String lat = "LAT: " + Double.toString(location.getLatitude()) + "\n";
-				String lon = "LON: " + Double.toString(location.getLongitude());	
-				return loctime + lat + lon;
+				Measurer.info("Location available.");
+				Measurer.toUpload.put("locTime", Globals.format.format(location.getTime()));
+				Measurer.toUpload.put("lat", location.getLatitude());
+				Measurer.toUpload.put("lon", location.getLongitude());
 			}
-		} else {
-			Measurer.info("Service not connected.");
-			return "LOC: Service not connected.";
 		}
 	}
 	

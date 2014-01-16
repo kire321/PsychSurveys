@@ -67,6 +67,10 @@ with open("log.txt", "a") as f:
         if '' in query:
             del query['']
 
+        if method == "POST":
+            post = sys.stdin.read()
+            f.write(post + "\n")
+
         with open("secret") as secret:
             if method == "GET" and len(query) == 1 and "revNo" in query and query["revNo"].isdigit:
                 if int(query["revNo"]) < revNo:
@@ -75,9 +79,15 @@ with open("log.txt", "a") as f:
                     reply("\nNo update.")
             elif method == "POST" and len(query) == 1 and "survey" in query and query["survey"] == "":
                 setCookie("survey", str(randint(0,1e12)))
-                sendQuestion(surveys.testQuestion)
+                measurements = json.loads(post)
+                measurements.update(requestCookie)
+                question = surveys.getQuestion(measurements)
+                if question:
+                    sendQuestion(question)
+                else:
+                    reply("\nNo survey.")
+
             elif method == "POST" and len(query) == 0:
-                f.write(sys.stdin.read() + "\n")
                 reply("Status: 200 Success")
             elif method == "GET" and len(query) == 2 and "question" in query and "answer" in query and query["question"].isdigit and query["answer"].isdigit:
                 sendQuestion(surveys.Question.questions[int(query["question"])][int(query["answer"])])

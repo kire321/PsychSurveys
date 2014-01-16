@@ -1,3 +1,8 @@
+from random import random
+from schemas import allOf, SurveyResponse
+from datetime import datetime, timedelta
+
+
 class Question(object):
 
     questions = []
@@ -12,22 +17,34 @@ class Question(object):
         self.answers.append(text)
         Question.questions[self.idNum].append(nextQuestion)
 
-testQuestion = Question("Which of the following best describes what you are currently doing?")
+
+def getQuestion(client):
+    awake = client.get("sound", 0) > 10000 or client["accel"] > .3
+    if awake:# and random() < .1:
+        responses = filter(lambda response: response.clientID == client["clientID"], allOf(SurveyResponse))
+        if len(responses) == 0:
+            answeredRecently = False
+        else:
+            answeredRecently = datetime.now() - lastResponse.time < timedelta(0, 8 * 60 * 60)
+        if not answeredRecently:
+            return q1
+
+q1 = Question("Which of the following best describes what you are currently doing?")
 q2 = Question("Are you currently:")
 q3 = Question("How would you describe your current environment:")
 q4 = Question("Are you currently:")
 emotions = [Question(("Indicate how strongly are you currently experiencing"
         " this emotion using a rating scale of 1 to 5 where 1 = not at all"
-        " and 5 = very strong: %s" % emotion)) for emotion in [
+        " and 5 = very strong:\n\n%s\n" % emotion)) for emotion in [
             "Content", "Anxious", "Excited", "Lethargic",
             "Surprised", "Happy", "Sad", "Quiet"]]
 finish = Question("Thanks for taking the survey.")
 
-testQuestion.addAnswer("Studying/Class/Research/Other Academic Activity", q2)
-testQuestion.addAnswer("Socializing/Talking/Interacting with Friends of Family", q4)
-testQuestion.addAnswer("Non-academic work", q4)
-testQuestion.addAnswer("Sports/Exercise/Extra-Curricular Activity", q4)
-testQuestion.addAnswer("Other", q4)
+q1.addAnswer("Studying/Class/Research/Other Academic Activity", q2)
+q1.addAnswer("Socializing/Talking/Interacting with Friends of Family", q4)
+q1.addAnswer("Non-academic work", q4)
+q1.addAnswer("Sports/Exercise/Extra-Curricular Activity", q4)
+q1.addAnswer("Other", q4)
 
 q2.addAnswer("In class", finish)
 q2.addAnswer("Studying or preparing for class", q3)
@@ -53,4 +70,3 @@ for i in range(len(emotions) - 1):
 
 for i in range(1, 6):
     emotions[-1].addAnswer(str(i), finish)
-
