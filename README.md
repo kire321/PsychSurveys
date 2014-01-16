@@ -42,7 +42,7 @@ In reaction to the timer, the client:
 The Client
 ----------
 
-Recall that PsychSurveys is event-driven and the code is primarily concerned with describing to external frameworks when certain blocks of code should be run. Since functions are not first-class in Java, the idiomatic way to this is using the classes. The external framework defines a class, such as `BroadcastReceiver`. The actual callback is a method, such as `BroadcastReceivers`'s `onReceive` method. One specifies a callback by passing an object with an overriden `onReceive` method back to the framework. PsychSurveys uses a wide variety of external frameworks and callback classes. However, when a callback class is used several times, code repitition can be cut down by putting commonly needed code in a class that inherits. For example, there are three subclasses of `BroadcastReceiver` that need to wake up the phone and keep it awake until their work is done. PsychSurveys contains a class `RepeatingTask` that inherits from `BroadcastReceiver` and implements phone-waking-up. `Reporter`, `Measurer`, and `Updater` are subclasses of `RepeatingTask`, and so also of `BroadcastReceiver`.
+Recall that PsychSurveys is event-driven and the code is primarily concerned with describing to external frameworks when certain blocks of code should run. Since functions are not first-class in Java, the idiomatic way to this is using classes. The external framework defines a class, such as `BroadcastReceiver`. The actual callback is a method, such as `BroadcastReceivers`'s `onReceive` method. One specifies a callback by passing an object with an overriden `onReceive` method back to the framework. PsychSurveys uses a wide variety of external frameworks and callback classes. However, when a callback class is used several times, code repitition can be cut down by putting commonly needed code in a class that inherits. For example, there are three subclasses of `BroadcastReceiver` that need to wake up the phone and keep it awake until their work is done. PsychSurveys contains a class `RepeatingTask` that inherits from `BroadcastReceiver` and implements phone-waking-up.
 
 These are the PsychSurveys classes that add commonly needed code to callback classes.
 - ExceptionHandlingResponseHandler adds exception handling to HTTP request callbacks. Subclasses are scattered throughout the code base.
@@ -51,21 +51,21 @@ These are the PsychSurveys classes that add commonly needed code to callback cla
 	- Bluetooth
 	- Loc
 	- Sound
-- RepeatingTask contains the logging aspect and wake up the phone. Subclasses:
+- RepeatingTask contains the logging aspect and wakes up the phone. Subclasses:
 	- Measurement
 	- Reporter
 	- Updater
 
 The preceeding discussion described most of the client. There are a few important miscellaneous classes.
 - BootBroadcastReceiver restarts PsychSurveys if the phone was rebooted.
-- Globals contains constands and methods for scheduling `RepeatingTask` subclasses.
+- Globals contains methods for scheduling `RepeatingTask` subclasses and miscellaneous constants.
 - MainActivity launches PsychSurveys if a user taps the icon.
 - SurveyActivity displays survey questions.
 
 The Server
 ----------
 
-`backend.cgi` is run by HTTPD when the corresponding URL is requested. `stdout` is interpreted by HTTPD as containing the HTTP response. The very first action of `backend.cgi` is to open a log file where any exceptions will be written. It then parses the request, logs any important information, sets cookies if appropriate, and determines what the client wants. If the request is simple (uploading log messages, checking for updates) backend.cgi contains the logic for replying. For more sophisticated tasks (giving survey questions, tabulating survey responses) the logic for replying is contained in a seperate file.
+`backend.cgi` is run by HTTPD when the corresponding URL is requested. `stdout` is interpreted by HTTPD as containing the HTTP response, so stack traces and log messages cannot appear here. The very first action of `backend.cgi` is to open a log file where any stack traces will be written. It then parses the request, logs any important information, sets cookies if appropriate, and determines what the client wants. If the request is simple (uploading log messages, checking for updates) backend.cgi contains the logic for replying. For more sophisticated tasks (giving survey questions, tabulating survey responses) the logic for replying is contained in a seperate file.
 
 `surveys.py` contains the survey questions, the possible answers, and conditions under which surveys should be asked. `backend.cgi` calls `getQuestion` when the client could start a survey. `getQuestion` should return a `Question` object, or `None` if the circumstances are not right for a survey. The `Question` class maintains a list of all the questions and answers. `backend.cgi` uses this listing to determine what question is next if the client has just answered a question. If a question has no answers, the client will add a "Close PsychSurveys" button. 
 
@@ -119,4 +119,4 @@ Open Bugs/Technical Debt
 
 - Location measurement doesn't actually activate the GPS, so locations are probably low accuracy.
 
-- `ip.py` should be replaced with a better way of counting active users
+- `ip.py` double counts anyone who changed IPs in the last few hours. It should be replaced by a method based on cookies.
