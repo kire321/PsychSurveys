@@ -15,7 +15,7 @@ def tabulate():
     for survey in surveys.values():
         answers = ["No answer"] * len(Question.questions)
         for response in survey:
-            answers[response.question] = str(response.answer + 1)
+            answers[response.question] = str(response.answer)
         csv += ', '.join([survey[0].clientID] + answers) + '\n'
 
     return csv

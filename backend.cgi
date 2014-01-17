@@ -7,7 +7,7 @@ from time import localtime
 import json
 from random import randint
 
-revNo = 3
+revNo = 4
 
 def now():
     time = localtime()
@@ -47,6 +47,7 @@ with open("log.txt", "a") as f:
         logEnvVar("HTTP_X_FORWARDED_FOR")
         logEnvVar("REQUEST_METHOD")
         if "HTTP_COOKIE" in os.environ:
+            logEnvVar("HTTP_COOKIE")
             pairs = os.environ['HTTP_COOKIE'].split('; ')
             indices = map(lambda pair: pair.find('='), pairs)
             requestCookie = dict([(pair[:index], pair[index+1:]) for pair, index in zip(pairs, indices)])

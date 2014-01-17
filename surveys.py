@@ -25,7 +25,7 @@ def getQuestion(client):
         if len(responses) == 0:
             answeredRecently = False
         else:
-            answeredRecently = datetime.now() - lastResponse.time < timedelta(0, 8 * 60 * 60)
+            answeredRecently = datetime.now() - responses[-1].time < timedelta(0, 8 * 60 * 60)
         if not answeredRecently:
             return q1
 

@@ -26,7 +26,7 @@ public class Globals {
 	public static AsyncHttpClient client = new AsyncHttpClient();
 	
 	static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
-	static final int revisionNumber = 3;
+	static final int revisionNumber = 4;
 	static final String cache = "PsychSurveys.cache";
 	static final String url = "http://www.cs.stolaf.edu/projects/sensors/";
 	static final String cgi = url + "backend.cgi";

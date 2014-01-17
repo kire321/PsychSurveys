@@ -120,3 +120,7 @@ Open Bugs/Technical Debt
 - Location measurement doesn't actually activate the GPS, so locations are probably low accuracy.
 
 - `ip.py` double counts anyone who changed IPs in the last few hours. It should be replaced by a method based on cookies.
+
+- clientIDs sometimes change for unknown reasons
+
+- when you update, clientIDs change
