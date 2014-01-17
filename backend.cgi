@@ -18,6 +18,7 @@ with open("log.txt", "a") as f:
 
     responseCookie = ""
     clientID = ""
+    requestCookie = {}
 
     def setCookie(key, value):
         global responseCookie
@@ -27,6 +28,7 @@ with open("log.txt", "a") as f:
         global clientID
         clientID = str(randint(0, 1e12))
         setCookie("clientID", clientID)
+        requestCookie["clientID"] = clientID
 
     def logEnvVar(var):
         f.write("%s: %s\n" % (var, os.environ[var]))
